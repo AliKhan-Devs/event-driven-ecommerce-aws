@@ -1,0 +1,5 @@
+# ignore all nodemodules and .env in all services /inventory-service, odrder-service and payment-servie
+
+
+node_modules/
+**/.env
