@@ -42,12 +42,12 @@ export const startInventoryConsumer = async () => {
 
           console.log("🗑 Inventory Message Deleted");
         } catch (error) {
-          console.error("❌ Inventory Processing Failed:", error.message);
+          console.error(" Inventory Processing Failed:", error.message);
           // Do not delete → message retries
         }
       }
     } catch (error) {
-      console.error("❌ SQS Polling Error:", error);
+      console.error(" SQS Polling Error:", error);
     }
   }
 };

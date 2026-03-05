@@ -1,27 +1,31 @@
-import { Inventory } from "../models/Inventory.js";
-
-/**
- * Handles stock deduction when order is placed
- */
+import {Inventory} from "../models/Inventory.js";
 export const processInventory = async (orderData) => {
   console.log("📦 Processing Inventory for Order:", orderData.orderId);
 
-  const { productId, quantity } = orderData;
+  const { items } = orderData;
 
-  const product = await Inventory.findOne({ productId });
+  for (const item of items) {
+    const { productId, quantity } = item;
 
-  if (!product) {
-    throw new Error("Product not found ❌");
+    const product = await Inventory.findOne({ productId });
+
+    if (!product) {
+      throw new Error(`Product ${productId} not found `);
+    }
+
+    if (product.stock < quantity) {
+      throw new Error(`Insufficient stock for ${productId} `);
+    }
+
+    product.stock -= quantity;
+    await product.save();
+
+    console.log(
+      ` Inventory Updated for ${productId}. Remaining stock: ${product.stock}`
+    );
   }
 
-  if (product.stock < quantity) {
-    throw new Error("Insufficient Stock ❌");
-  }
+  console.log(" Inventory processing completed");
 
-  product.stock -= quantity;
-  await product.save();
-
-  console.log("✅ Inventory Updated. Remaining stock:", product.stock);
-
-  return product;
+  return true;
 };

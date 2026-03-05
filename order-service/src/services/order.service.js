@@ -10,14 +10,16 @@ import { snsClient } from "../config/aws.js";
  * - Order persistence
  * - Event publishing to SNS
  */
-export const createOrder = async (amount) => {
+export const createOrder = async (data) => {
   const orderId = uuidv4();
+  const { amount, items } = data;
 
   // Save order locally
   const order = await Order.create({
     orderId,
     amount,
     status: "PENDING",
+    items
   });
 
   // Create domain event
@@ -25,6 +27,7 @@ export const createOrder = async (amount) => {
     eventType: "ORDER_CREATED",
     orderId,
     amount,
+    items,
     createdAt: new Date(),
   };
 

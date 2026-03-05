@@ -17,10 +17,10 @@ export const processPayment = async (orderData) => {
   });
 
   if (!isSuccess) {
-    throw new Error("Payment Failed ❌");
+    throw new Error("Payment Failed ");
   }
 
-  console.log("✅ Payment Successful:", payment._id);
+  console.log(" Payment Successful:", payment._id);
 
   return payment;
 };

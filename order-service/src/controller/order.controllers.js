@@ -6,13 +6,13 @@ import { createOrder } from "../services/order.service.js";
  */
 export const createOrderHandler = async (req, res) => {
   try {
-    const { amount } = req.body;
+    const data = req.body;
 
-    if (!amount) {
+    if (!data.amount) {
       return res.status(400).json({ error: "Amount is required" });
     }
 
-    const order = await createOrder(amount);
+    const order = await createOrder(data);
 
     return res.status(201).json({
       message: "Order created successfully",

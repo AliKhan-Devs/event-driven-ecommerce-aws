@@ -11,6 +11,18 @@ const orderSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    items: [
+  {
+    productId: {
+      type: String,
+      required: true
+    },
+    quantity: {
+      type: Number,
+      required: true
+    }
+  }
+],
     amount: {
       type: Number,
       required: true,

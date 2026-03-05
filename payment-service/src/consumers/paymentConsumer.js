@@ -43,12 +43,12 @@ export const startPaymentConsumer = async () => {
 
           console.log("🗑 Message Deleted");
         } catch (error) {
-          console.error("❌ Error processing payment:", error.message);
+          console.error(" Error processing payment:", error.message);
           // Do NOT delete message (will retry)
         }
       }
     } catch (error) {
-      console.error("❌ SQS Polling Error:", error);
+      console.error(" SQS Polling Error:", error);
     }
   }
 };
