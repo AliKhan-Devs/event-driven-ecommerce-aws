@@ -32,7 +32,15 @@ export const startOrderConsumer = async () => {
           const body = JSON.parse(message.Body);
           const orderData = JSON.parse(body.Message);
 
-            await revertOrder(orderData.orderId);
+            if(eventData.eventType === "INVENTORY_FAILED") {
+              await revertOrder(orderData.orderId);
+            }else if (orderData.eventType === "PAYMENT_FAILED") {
+              await revertOrder(orderData.orderId);
+            }
+            else {
+              // udpate order status to completed
+              await updateOrderStatus(orderData.orderId, "COMPLETED");
+            }
 
           // Delete message after success
           await sqs.send(

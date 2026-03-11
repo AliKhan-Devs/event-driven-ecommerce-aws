@@ -25,6 +25,7 @@ export const processInventory = async (orderData) => {
 
     if (product.stock < quantity) {
       throw new Error(`Insufficient stock for ${productId} `);
+      // publish event to SNS
     }
 
     product.stock -= quantity;
