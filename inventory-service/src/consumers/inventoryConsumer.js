@@ -30,7 +30,7 @@ export const startInventoryConsumer = async () => {
         try {
           const body = JSON.parse(message.Body);
           const orderData = JSON.parse(body.Message);
-
+        
           await processInventory(orderData);
 
           await sqs.send(

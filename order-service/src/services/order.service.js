@@ -36,6 +36,12 @@ export const createOrder = async (data) => {
     new PublishCommand({
       TopicArn: process.env.SNS_TOPIC_ARN,
       Message: JSON.stringify(event),
+      MessageAttributes: {
+        eventType: {
+          DataType: "String",
+          StringValue: "ORDER_CREATED",
+        },
+      },
     })
   );
 

@@ -3,7 +3,7 @@ import {
   ReceiveMessageCommand,
   DeleteMessageCommand,
 } from "@aws-sdk/client-sqs";
-import { processPayment } from "../services/paymentProcessor.js";
+import { processPayment, revertPayment } from "../services/paymentProcessor.js";
 
 const sqs = new SQSClient({ region: process.env.AWS_REGION });
 
@@ -31,6 +31,14 @@ export const startPaymentConsumer = async () => {
           const body = JSON.parse(message.Body);
           const orderData = JSON.parse(body.Message);
 
+          // if event type is order_created, process payment and if event type is inventory failed, revert payment
+          if (body.Type === "Notification") {
+            if (orderData.eventType === "ORDER_CREATED") {
+              await processPayment(orderData);
+            } else if (orderData.eventType === "INVENTORY_FAILED") {
+              await revertPayment(orderData);
+            }
+          }
           await processPayment(orderData);
 
           // Delete message after success
