@@ -3,16 +3,16 @@ import {
   ReceiveMessageCommand,
   DeleteMessageCommand,
 } from "@aws-sdk/client-sqs";
-import { processPayment } from "../services/paymentProcessor.js";
-import { revertPayment } from "../services/paymentRevert.js";
+import { revertOrder } from "../services/order.service";
+
 
 const sqs = new SQSClient({ region: process.env.AWS_REGION });
 
 /**
  * Polls SQS Queue continuously
  */
-export const startPaymentConsumer = async () => {
-  console.log("👂 Payment Service Listening to SQS...");
+export const startOrderConsumer = async () => {
+  console.log("Order Service Listening to SQS...");
 
   while (true) {
     try {
@@ -32,15 +32,15 @@ export const startPaymentConsumer = async () => {
           const body = JSON.parse(message.Body);
           const orderData = JSON.parse(body.Message);
 
-          // if event type is order_created, process payment and if event type is inventory failed, revert payment
-          if (body.Type === "Notification") {
-            if (orderData.eventType === "ORDER_CREATED") {
-              await processPayment(orderData);
-            } else if (orderData.eventType === "INVENTORY_FAILED") {
-              await revertPayment(orderData.orderId);
+            if(eventData.eventType === "INVENTORY_FAILED") {
+              await revertOrder(orderData.orderId);
+            }else if (orderData.eventType === "PAYMENT_FAILED") {
+              await revertOrder(orderData.orderId);
             }
-          }
-          await processPayment(orderData);
+            else {
+              // udpate order status to completed
+              await updateOrderStatus(orderData.orderId, "COMPLETED");
+            }
 
           // Delete message after success
           await sqs.send(
@@ -52,7 +52,7 @@ export const startPaymentConsumer = async () => {
 
           console.log("🗑 Message Deleted");
         } catch (error) {
-          console.error(" Error processing payment:", error.message);
+          console.error(" Error processing Order delete:", error.message);
           // Do NOT delete message (will retry)
         }
       }

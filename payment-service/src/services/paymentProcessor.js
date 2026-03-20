@@ -1,4 +1,5 @@
 import { Payment } from "../models/Payment.js";
+import { publishPayment } from "../publisher/publish.js";
 
 /**
  * Simulates payment processing logic
@@ -7,20 +8,38 @@ import { Payment } from "../models/Payment.js";
 export const processPayment = async (orderData) => {
   console.log("💳 Processing Payment for Order:", orderData.orderId);
 
-  // Simulate random failure (for future SAGA testing)
+  // Simulate random failure (for  SAGA testing)
   const isSuccess = Math.random() > 0.2;
 
+  if (!isSuccess) {
+  //  create event object and publish to SNS
+    const event = {
+      eventType: "PAYMENT_FAILED",
+      orderId: orderData.orderId,
+      amount: orderData.amount,
+      items: orderData.items,
+      createdAt: new Date(),
+    };
+    await publishPayment(event);
+    return null; // Indicate failure
+  }
+
+// save payment record to database
   const payment = await Payment.create({
     orderId: orderData.orderId,
     amount: orderData.amount,
-    status: isSuccess ? "SUCCESS" : "FAILED",
+    status: "COMPLETED",
   });
 
-  if (!isSuccess) {
-    throw new Error("Payment Failed ");
-  }
-
-  console.log(" Payment Successful:", payment._id);
-
+  // create event object and publish to SNS
+  const event = {
+    eventType: "PAYMENT_SUCCESSFUL",
+    orderId: orderData.orderId,
+    amount: orderData.amount,
+    items: orderData.items,
+    createdAt: new Date(),
+  };
+  await publishPayment(event);
   return payment;
 };
+

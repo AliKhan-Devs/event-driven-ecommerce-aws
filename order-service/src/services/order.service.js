@@ -1,28 +1,11 @@
-import { PublishCommand } from "@aws-sdk/client-sns";
-import { v4 as uuidv4 } from "uuid";
+import { Order } from "../models/order.model";
+import { publishOrder } from "../publisher/publish";
 
-import { Order } from "../models/order.model.js";
-import { snsClient } from "../config/aws.js";
-
-/**
- * Business logic layer.
- * Handles:
- * - Order persistence
- * - Event publishing to SNS
- */
 export const createOrder = async (data) => {
   const orderId = uuidv4();
   const { amount, items } = data;
-
-  // Save order locally
-  const order = await Order.create({
-    orderId,
-    amount,
-    status: "PENDING",
-    items
-  });
-
-  // Create domain event
+  const order = await Order.create({ orderId, amount, items, status: "PENDING" });
+  // create event object and publish to SNS
   const event = {
     eventType: "ORDER_CREATED",
     orderId,
@@ -30,14 +13,22 @@ export const createOrder = async (data) => {
     items,
     createdAt: new Date(),
   };
-
-  // Publish event to SNS
-  await snsClient.send(
-    new PublishCommand({
-      TopicArn: process.env.SNS_TOPIC_ARN,
-      Message: JSON.stringify(event),
-    })
-  );
-
+  await publishOrder(event);
   return order;
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  const order = await Order.findOneAndUpdate({ orderId }, { status }, { new: true });
+  return order;
+};
+
+
+// delete order status to failed in case of inventory failure or payment failure
+export const revertOrder = async (orderId) => {
+  // delete from database 
+  await Order.findOneAndDelete({ orderId });
+  // or update status to failed
+  // const order = await Order.findOneAndUpdate({ orderId }, { status: "FAILED" }, { new: true });
+  // return order;
+
 };

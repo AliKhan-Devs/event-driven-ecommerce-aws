@@ -1,4 +1,4 @@
-import { createOrder } from "../services/order.service.js";
+import { createOrder } from "../services/order.service";
 
 /**
  * HTTP Controller.
