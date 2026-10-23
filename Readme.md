@@ -216,7 +216,7 @@ curl -X POST http://localhost:4000/api/orders \
 
 Check service logs to see complete transaction flow and any rollbacks.
 
-## 📊 SAGA Pattern Details
+## SAGA Pattern Details
 
 ### Choreography-based SAGA
 This implementation uses **event-driven choreography** where:
@@ -259,7 +259,7 @@ This implementation uses **event-driven choreography** where:
 - **Payment Service**: [pictures/payment_service.png](pictures/payment_service.png) - Queue message processing
 - **Inventory Service**: [pictures/inventory_service.png](pictures/inventory_service.png) - Stock updates
 
-## 🔧 SAGA Pattern Development Notes
+## SAGA Pattern Development Notes
 
 ### Key Implementation Considerations
 
