@@ -9,7 +9,7 @@ import { revertPayment } from "../services/paymentRevert.js";
 const sqs = new SQSClient({ region: process.env.AWS_REGION });
 
 /**
- * Polls SQS Queue continuously
+ * Polls the payment SQS queue and routes each SNS notification by event type.
  */
 export const startPaymentConsumer = async () => {
   console.log("👂 Payment Service Listening to SQS...");
@@ -28,21 +28,28 @@ export const startPaymentConsumer = async () => {
 
       for (const message of response.Messages) {
         try {
-          // SNS wraps original message inside Message field
-          const body = JSON.parse(message.Body);
-          const orderData = JSON.parse(body.Message);
+          // By default, SNS wraps the published event in its Message field.
+          const notification = JSON.parse(message.Body);
 
-          // if event type is order_created, process payment and if event type is inventory failed, revert payment
-          if (body.Type === "Notification") {
-            if (orderData.eventType === "ORDER_CREATED") {
-              await processPayment(orderData);
-            } else if (orderData.eventType === "INVENTORY_FAILED") {
-              await revertPayment(orderData.orderId);
-            }
+          if (notification.Type !== "Notification" || typeof notification.Message !== "string") {
+            throw new Error("Expected an SNS notification message");
           }
-          await processPayment(orderData);
 
-          // Delete message after success
+          const event = JSON.parse(notification.Message);
+
+          switch (event.eventType) {
+            case "ORDER_CREATED":
+              await processPayment(event);
+              break;
+            case "INVENTORY_FAILED":
+              await revertPayment(event.orderId);
+              break;
+            default:
+              // This queue may receive other events from the shared SNS topic.
+              console.log("Ignoring unsupported payment event:", event.eventType);
+          }
+
+          // Delete only after the event has been handled successfully or safely ignored.
           await sqs.send(
             new DeleteMessageCommand({
               QueueUrl: process.env.SQS_QUEUE_URL,
@@ -52,12 +59,12 @@ export const startPaymentConsumer = async () => {
 
           console.log("🗑 Message Deleted");
         } catch (error) {
-          console.error(" Error processing payment:", error.message);
-          // Do NOT delete message (will retry)
+          console.error("Error processing payment event:", error.message);
+          // Keep failed messages in SQS so they can be retried.
         }
       }
     } catch (error) {
-      console.error(" SQS Polling Error:", error);
+      console.error("SQS Polling Error:", error);
     }
   }
 };
