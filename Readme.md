@@ -2,7 +2,7 @@
 
 A distributed transaction implementation using the **SAGA pattern** with AWS SNS and SQS. This project demonstrates how to maintain data consistency across multiple microservices through choreography-based SAGA, ensuring reliable order processing in an e-commerce system.
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 This project implements a **Choreography-based SAGA pattern** where:
 - **Order Service** initiates a transaction by publishing an `ORDER_CREATED` event
@@ -33,7 +33,7 @@ SAGA Completion (All steps succeed) or Rollback (Any step fails)
 - **Database per Service**: Independent MongoDB instances with isolated data
 - **Fault Tolerance**: Message retry and dead-letter queues for failed transactions
 
-## 📦 Services
+## Services
 
 ### 1. Order Service (SAGA Initiator)
 - **Port**: 4000
@@ -73,7 +73,7 @@ SAGA Completion (All steps succeed) or Rollback (Any step fails)
 - **Technologies**: Node.js, MongoDB, AWS SQS SDK
 - **SAGA Role**: Second transaction step with compensation logic
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Runtime**: Node.js (ES Modules)
 - **Framework**: Express.js (Order Service)
@@ -82,14 +82,14 @@ SAGA Completion (All steps succeed) or Rollback (Any step fails)
 - **SDK**: AWS SDK v3 for JavaScript
 - **Development**: Nodemon for hot reloading
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js (v16 or higher)
 - MongoDB (local or Atlas)
 - AWS Account with SNS and SQS access
 - AWS CLI configured (optional, for local testing)
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### 1. Clone the Repository
 ```bash
@@ -178,7 +178,7 @@ cd inventory-service
 npm run dev
 ```
 
-## 🧪 Testing the System
+## Testing the System
 
 ### Create an Order (Start SAGA Transaction)
 ```bash
@@ -248,7 +248,7 @@ This implementation uses **event-driven choreography** where:
 - **Transaction Isolation**: Each service manages its own transaction isolation
 - **Visibility**: Incomplete transactions remain visible with explicit status (`PENDING`, `FAILED`)
 
-## 📸 Screenshots
+## Screenshots
 
 ### AWS Console Dashboards
 - **SNS Topic**: [pictures/sns.png](pictures/sns.png) - Shows topic configuration and subscriptions
@@ -292,7 +292,7 @@ This implementation uses **event-driven choreography** where:
    - Monitor queue depths for bottlenecks
    - Alert on compensation events (indicates failures)
 
-## 📚 Learning Outcomes
+## Learning Outcomes
 
 This project helps understand:
 - Implementing distributed transactions with SAGA pattern
@@ -305,7 +305,7 @@ This project helps understand:
 - Idempotent message processing
 - Monitoring distributed transactions
 
-## 🤝 Contributing
+## Contributing
 
 This is a practice repository. Feel free to:
 - Add more services (e.g., shipping, notifications)
@@ -313,7 +313,7 @@ This is a practice repository. Feel free to:
 - Add monitoring and logging
 - Experiment with different AWS configurations
 
-## 📄 License
+## License
 
 ISC License - See individual service package.json files
 
@@ -326,7 +326,7 @@ ISC License - See individual service package.json files
 
 ---
 
-## 📊 SAGA Transaction Event Flow
+## SAGA Transaction Event Flow
 
 ### Complete Order Processing Workflow
 
@@ -378,7 +378,7 @@ SAGA Transaction Rolled Back ✓
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - Node.js (ES Modules)
 - MongoDB
@@ -390,7 +390,7 @@ SAGA Transaction Rolled Back ✓
 
 ---
 
-## ✅ SAGA Pattern Advantages & Challenges
+## SAGA Pattern Advantages & Challenges
 
 ### Advantages
 - ✓ **Decoupled Services**: Services don't call each other directly
@@ -409,7 +409,7 @@ SAGA Transaction Rolled Back ✓
 
 ---
 
-## 🧪 Sample Event Payloads
+## Sample Event Payloads
 
 ### ORDER_CREATED Event
 ```json
